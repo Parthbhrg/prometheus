@@ -1,0 +1,65 @@
+{
+    "type": "Microsoft.ContainerInstance/containerGroups",
+    "apiVersion": "2021-03-01",
+    "name": "prometheus-sample-app",
+    "location": "southeastasia",
+    "properties": {
+        "containers": [
+            {
+                "name": "sampleapp",
+                "properties": {
+                    "image": "oneobservabilityworkshop.azurecr.io/demo-sampleapp:latest",
+                    "resources": {
+                        "requests": {
+                            "cpu": 1,
+                            "memoryInGb": 3
+                        }
+                    },
+                    "ports": [
+                        {
+                            "port": 8080,
+                            "protocol": "TCP"
+                        }
+                    ],
+                    "environmentVariables": [],
+                    "volumeMounts": []
+                }
+            },
+            {
+                "name": "aws-otel-collector",
+                "properties": {
+                    "image": "rakeshpatil993.azurecr.io/oetl-custom-rak:v4",
+                    "resources": {
+                        "requests": {
+                            "cpu": 1,
+                            "memoryInGb": 3
+                        }
+                    },
+                    "command": [
+                        "--config=/etc/ecs/otel-all-config.yaml"
+                    ],
+                    "environmentVariables": [
+                        {
+                            "name": "AWS_PROMETHEUS_ENDPOINT",
+                            "value": "https://aps-workspaces.ap-southeast-1.amazonaws.com/workspaces/ws-b29a9696-711e-4088-8680-3a156a2a0d20/api/v1/remote_write"
+                        }
+                    ],
+                    "volumeMounts": []
+                }
+            }
+        ],
+        "osType": "Linux",
+        "restartPolicy": "Always",
+        "ipAddress": {
+            "ports": [
+                {
+                    "protocol": "TCP",
+                    "port": 8080
+                }
+            ],
+            "type": "Public",
+            "dnsNameLabel": "prometheus-sample-app-dns"
+        }
+    },
+    "tags": {}
+}
